@@ -1,0 +1,373 @@
+flowerGeneratorGUI();
+
+proc flowerGeneratorGUI()
+{
+    string $mywindow = `window -title "Floral Generator" -menuBar true - widthHeight 483 700`;
+    
+    menu -label "Select a preset";
+        menuItem -label "Lily" -command "presetLily()";
+        menuItem -label "Tulip" -command "presetTulip()";
+        menuItem -label "Carnation" -command "presetCarnation()";
+        menuItem -label "Daisy" -command "presetDaisy()";
+        
+    columnLayout;
+    
+        frameLayout -collapsable true -label "General Flower Settings" -width 475 -height 135;
+        
+        columnLayout;
+        
+            intSliderGrp -label "Flower diameter" -field true -min 1 -max 10 -value 5 flowerDiameter;   
+            intSliderGrp -label "Stem height" -field true -min 1 -max 10 -value 7 stemHeight; 
+            intSliderGrp -label "Plant density" -field true -min 1 -max 5 -value 3 plantDensity;
+            
+            radioButtonGrp -nrb 3 -label "Randomization" -la3 "none" "low" "high" -sl 2 plantDensityRand; 
+            
+            optionMenu -label "Flower Orientation" orientation;
+                menuItem -label "+x";
+                menuItem -label "-x";
+                menuItem -label "+y";
+                menuItem -label "-y";
+                menuItem -label "+z";
+                menuItem -label "-z";
+                menuItem -label "normals";        
+            
+        setParent ..;  
+        
+    setParent ..;
+    
+    columnLayout;
+    
+        frameLayout -collapsable true -label "Petal Settings" -width 475 -height 180;
+        
+        columnLayout;
+        
+            intSliderGrp -label "Flower centre size" -field true -min 1 -max 10 -value 5 flowerCentreSize;   
+            intSliderGrp -label "Petals per row" -field true -min 5 -max 15 -value 7 numPetalsPerRow; 
+            intSliderGrp -label "Rows of petals" -field true -min 1 -max 3 -value 1 numPetalRows;
+            
+            radioButtonGrp -nrb 2 -label "Edges" -la2 "smooth" "rough" -sl 1 petalSmoothness;
+            radioButtonGrp -nrb 2 -label "Shape" -la2 "rounded" "pointed" -sl 1 petalShape;
+            
+            intSliderGrp -label "Petal length" -field true -min 1 -max 5 -value 1 petalLength;
+            
+            radioButtonGrp -nrb 2 -label "Petal orientation" -la2 "out from centre" "up from centre" -sl 1 petalOrientation;        
+            
+        setParent ..;  
+        
+    setParent ..;
+    
+    columnLayout;
+    
+        frameLayout -collapsable true -label "Leaf Settings" -width 475 -height 115;
+        
+        columnLayout;
+        
+            intSliderGrp -label "Size" -field true -min 1 -max 5 -value 2 leafSize;   
+            intSliderGrp -label "Length" -field true -min 1 -max 3 -value 7 leafLength; 
+            
+            radioButtonGrp -nrb 2 -label "Shape" -la2 "rounded" "pointed" -sl 1 leafShape;
+            
+            intSliderGrp -label "Average leaves per stem" -field true -min 1 -max 3 -value 1 leavesPerStem;       
+            
+        setParent ..;  
+        
+    setParent ..;
+    
+    columnLayout;
+    
+        frameLayout -collapsable true -label "Colour Settings" -width 475 -height 245;
+        
+        columnLayout;
+        
+            colorSliderGrp -label "Centre" -hsv 50 1 1 centreColour1;
+            colorSliderGrp -label "(range)" -hsv 50 1 1 centreColour2;
+            
+            radioButtonGrp -nrb 3 -label "Randomization" -la3 "none" "low" "high" -sl 1 centreColourRand;
+            
+            colorSliderGrp -label "Petals" -hsv 330 1 1 petalColour1;
+            colorSliderGrp -label "(range)" -hsv 330 1 1 petalColour2;
+            
+            radioButtonGrp -nrb 3 -label "Randomization" -la3 "none" "low" "high" -sl 1 petalColourRand;
+            
+            colorSliderGrp -label "Stem/leaf" -hsv 100 1 1 stemColour1;
+            colorSliderGrp -label "(range)" -hsv 100 1 1 stemColour2;
+            
+            radioButtonGrp -nrb 3 -label "Randomization" -la3 "none" "low" "high" -sl 1 stemColourRand;
+            
+        setParent ..;  
+        
+    setParent ..;
+    
+    columnLayout;
+                
+        button -label "Generate Flowers" -command "generate()";
+        
+    setParent ..;
+    
+    showWindow;
+}
+
+global proc generate()
+{
+    string $pathType = getSelectedPath();
+    
+    if($pathType != "")
+    {
+        float $flowerLocations[] = getFlowerLocations($pathType);
+        
+        select -cl;
+        
+        createFlower();
+    }
+    else
+    {
+        print "You must select a curve, surface or mesh.";
+    }
+    
+    
+}
+
+proc string getSelectedPath()
+{
+    string $selection[] = `ls -selection`;
+    
+    if($selection[0] != "")
+    {
+        string $childShape[] = `listRelatives -fullPath -shapes $selection[0]`;
+        string $shapeType = `objectType $childShape[0]`;
+        
+        return $shapeType;
+    }
+    else
+        return "";
+}
+
+//shape options: nurbsCurve, nurbsSurface, mesh
+proc float[] getFlowerLocations(string $pathType)
+{
+    if($pathType == "nurbsCurve")
+    {
+        //handle curve
+    }
+    else if($pathType == "nurbsSurface")
+    {
+        //handle surface
+    }
+    else if($pathType == "mesh")
+    {
+        //handle mesh
+    }
+    
+    float $test[] = {0.0, 0.0, 0.0}; 
+    
+    return $test;
+}
+
+proc createFlower()
+{
+    string $namespace_tmp = initNamespace();
+
+    createCentre($namespace_tmp);
+    createPetal($namespace_tmp);
+    attachPetalRows($namespace_tmp);
+    
+    createLeaf();
+    
+    closeNamespace();
+}
+
+proc createCentre(string $namespace_tmp)
+{
+    int $diameter = `intSliderGrp -q -value flowerCentreSize`;
+    int $petalsPerRow = `intSliderGrp -q -value numPetalsPerRow`;
+    
+    float $hsv1[3] = `colorSliderGrp -q -hsvValue centreColour1`;
+    float $hsv2[3] = `colorSliderGrp -q -hsvValue centreColour2`;      
+    int $random = `radioButtonGrp -q -sl centreColourRand`;
+    
+    polySphere -name "centre" -sx 30 -sy 10 -r $diameter;
+    scale 1 0.25 1;   
+    
+    float $colour[] = selectColour($hsv1, $hsv2, $random);
+    
+    //createShader($colour, $namespace_tmp + ":centre", "lambert");
+}
+
+proc createPetal(string $namespace_tmp)
+{
+    int $petalsPerRow = `intSliderGrp -q -value numPetalsPerRow`;
+    int $centreDiameter = `intSliderGrp -q -value flowerCentreSize`;
+    
+    int $petalLengthRatio = `intSliderGrp -q -value petalLength`;
+    float $petalWidth = ((3.14 * $centreDiameter) / $petalsPerRow) * 1.95;
+    float $petalLength = $petalLengthRatio * $petalWidth;
+    
+    polyPlane -sx 4 -sy 2 -w $petalWidth -h $petalLength -name "basicPetal_0";
+
+    move 0 0 ($centreDiameter + ($petalLength/2.75));    
+    
+    //shape petal
+    select -r ($namespace_tmp + ":basicPetal_0.vtx[1:3]");
+    
+    move -r 0 0 ($petalLength/2);
+    
+    //handle shape
+    select -r ($namespace_tmp + ":basicPetal_0.vtx[2]");
+    
+    int $shape = `radioButtonGrp -q -sl petalShape`;
+    
+    if($shape == 1) //rounded
+    {
+        move -r 0 0 ($petalLength/10);
+    }
+    else //pointed
+    {
+        move -r 0 0 ($petalLength/5);
+    }    
+    
+    //handle edges
+    int $edges = `radioButtonGrp -q -sl petalSmoothness`;
+    
+    if($edges == 1) //smooth
+    {
+        //no action required
+    }
+    else //rough
+    {
+        select -r ($namespace_tmp + ":basicPetal_0.vtx[1]");
+        select -tgl ($namespace_tmp + ":basicPetal_0.vtx[3]");
+        move -r 0 ($petalLength/20) 0;
+    }
+}
+
+proc attachPetalRows(string $namespace_tmp)
+{
+    int $petalsPerRow = `intSliderGrp -q -value numPetalsPerRow`;
+    int $petalRows = `intSliderGrp -q -value numPetalRows`;
+    
+    float $angle = 360/$petalsPerRow;
+    
+    for($i = 1; $i < $petalsPerRow; $i++)
+    {
+        duplicate -n ("basicPetal_" + $i) ($namespace_tmp + ":basicPetal_" + ($i - 1));
+        select -r ($namespace_tmp + ":basicPetal_" + $i);
+        rotate -a 0 ($angle*$i) 0 -p 0 0 0;
+    }
+    
+    select -cl;    
+    
+    for($i = 0; $i < $petalsPerRow; $i++)
+    {
+        select -tgl ($namespace_tmp + ":basicPetal_" + $i);
+    }
+    
+    if($petalRows > 1)
+        polyUnite -n "petalRow_0" -ch 1;
+    else
+        polyUnite -n "petals" -ch 1;
+    
+    if($petalRows > 1)
+    {
+        int $centreDiameter = `intSliderGrp -q -value flowerCentreSize`;
+        
+        print $petalRows;
+        print "\n";
+        
+        float $rowSpace = ($centreDiameter/2)/$petalRows;
+        print $rowSpace;
+        $rowSpace = $rowSpace * 0.75;
+        
+        print $rowSpace;
+    
+        for($i = 1; $i < $petalRows; $i++)
+        {
+            duplicate -n ("petalRow_" + $i) ($namespace_tmp + ":petalRow_" + ($i - 1));
+            select -r ($namespace_tmp + ":petalRow_" + $i);
+            
+            rotate -a 0 (($angle/2)*$i) 0 -p 0 0 0;
+            move -r 0 $rowSpace 0;
+            scale 0.9 0.9 0.9;
+        }
+        
+        select -cl;        
+        
+        for($i = 0; $i < $petalRows; $i++)
+        {
+            select -tgl ($namespace_tmp + ":petalRow_" + $i);
+        }
+    
+        polyUnite -n "petals" -ch 1;
+    }
+}
+
+proc createLeaf()
+{
+
+}
+
+proc string initNamespace()
+{
+    string $namespace_tmp = randomName();
+    
+    select -cl;
+    
+    namespace -add $namespace_tmp;
+    namespace -set $namespace_tmp;
+    
+    return $namespace_tmp;
+}
+
+proc string randomName()
+{
+    int $rnd = `rand 10000`;
+    string $name = "Flower_" + $rnd;
+    
+    return $name;
+}
+
+proc closeNamespace()
+{
+    delete -ch;    
+    
+    namespace -set ":";
+}
+
+proc float[] selectColour(float $colour1[], float $colour2[], float $random)
+{
+    float $variance, $position;
+    float $step[3], $finalColour[3];
+    
+    //how much to mess with selected colours
+    switch($random)
+    {
+        case 1:
+            $variance = 1;
+            break;
+        case 2:
+            $variance = 2;
+            break;
+        case 3:
+            $variance = 5;
+            break;
+    }
+    
+    //where in the colour range to select from
+    $position = `rand 11`;
+    $position = floor($position);
+    
+    for($i = 0; $i < 3; $i++)
+    {
+        $step[$i] = ($colour2[$i] - $colour1[$i]) / 10 * $variance;
+        
+        $finalColour[$i] = $colour1[$i] + ($position * $step[$i]);
+    }
+    
+    return $finalColour;
+}
+
+proc createShader(float $colour[], string $obj, string $shader)
+{
+    shadingNode -asShader $shader -name "flowerMaterial";
+    setAttr ($obj + ":flowerMaterial.color") -type double3 $colour[0] $colour[1] $colour[2];    
+    hyperShade -assign ($obj + ":blockMaterial");
+}

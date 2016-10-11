@@ -1,0 +1,92 @@
+string $mywindow = `window -title "Floral Generator" -menuBar true - widthHeight 480 750`;
+
+menu -label "Select a preset";
+    menuItem -label "Daisy" -command "doNothing()";
+    menuItem -label "Lily" -command "doNothing()";
+    menuItem -label "Tulip" -command "doNothing()";
+    menuItem -label "Rose" -command "doNothing()";
+    
+columnLayout;
+
+    frameLayout -collapsable true -label "General Flower Settings" -width 475 -height 140;
+    
+    columnLayout;
+    
+        intSliderGrp -label "Flower diameter" -field true -min 1 -max 10 -value 3 blockHeight;   
+        intSliderGrp -label "Stem height" -field true -min 1 -max 10 -value 2 blockWidth; 
+        intSliderGrp -label "Plant density" -field true -min 1 -max 5 -value 3 blockDepth;         
+        
+        radioButtonGrp -nrb 3 -label "Randomization" -la3 "none" "low" "high";
+        
+        attrEnumOptionMenuGrp -label "Flower Orientation"
+            -ei 0 "+x"
+            -ei 1 "-x"
+            -ei 2 "+y"
+            -ei 3 "-y"
+            -ei 4 "+z"
+            -ei 5 "-z"
+            -ei 6 "follow normals";
+        
+    setParent ..;  
+    
+setParent ..;
+
+    frameLayout -collapsable true -label "Petal Settings" -width 475 -height 180;
+    
+    columnLayout;
+    
+        intSliderGrp -label "Flower centre size" -field true -min 1 -max 10 -value 7 blo2ckHeig2ht;   
+        intSliderGrp -label "Petals per row" -field true -min 3 -max 15 -value 5 blockW2idth;
+        intSliderGrp -label "Rows of petals" -field true -min 1 -max 5 -value 3 block2Depth;         
+        
+        radioButtonGrp -nrb 2 -label "Edges" -la2 "smooth" "rough";
+        radioButtonGrp -nrb 2 -label "Shape" -la2 "round" "pointed";
+        
+        intSliderGrp -label "Petal length" -field true -min 1 -max 5 -value 3 blockD5epth;
+        
+        radioButtonGrp -nrb 2 -label "Petal orientation" -la2 "out from centre" "up from centre";
+        
+    setParent ..;  
+    
+setParent ..;
+
+    frameLayout -collapsable true -label "Leaf Settings" -width 475 -height 120;
+    
+    columnLayout;
+    
+        intSliderGrp -label "Size" -field true -min 1 -max 10 -value 7 blo2ckHzzzeig2ht;   
+        intSliderGrp -label "Length" -field true -min 3 -max 15 -value 5 blockzzzW2idth;
+
+        radioButtonGrp -nrb 2 -label "Shape" -la2 "round" "pointed";
+        
+        intSliderGrp -label "Leaves per stem" -field true -min 1 -max 5 -value 2 blockDzzz5epth;
+        
+    setParent ..;  
+    
+setParent ..;
+
+    frameLayout -collapsable true -label "Colour Settings" -width 475 -height 250;
+    
+    columnLayout;
+    
+        colorSliderGrp -label "Centre" -hsv 60 1 1;
+        colorSliderGrp -label "(range)" -hsv 60 1 1;
+        radioButtonGrp -nrb 3 -label "Randomization" -la3 "none" "low" "high";
+        
+        colorSliderGrp -label "Petals" -hsv 0 1 1;
+        colorSliderGrp -label "(range)" -hsv 0 1 1;
+        radioButtonGrp -nrb 3 -label "Randomization" -la3 "none" "low" "high";
+        
+        colorSliderGrp -label "Stem/leaf" -hsv 120 1 0.5;
+        colorSliderGrp -label "(range)" -hsv 120 1 0.5;
+        radioButtonGrp -nrb 3 -label "Randomization" -la3 "none" "low" "high";
+        
+    setParent ..;  
+    
+setParent ..;
+    
+showWindow $mywindow;
+
+proc doNothing(){
+
+}
